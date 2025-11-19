@@ -4,7 +4,6 @@
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![LangGraph](https://img.shields.io/badge/LangGraph-0.0.20+-green.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 一个基于LangGraph框架构建的智能Agent系统，包含通用Agent框架和图书推荐应用
 
@@ -436,15 +435,9 @@ pip install -r requirements.txt
 
 ---
 
-## 📄 许可证
-
-本项目采用 MIT 许可证。详情请参阅 [LICENSE](LICENSE) 文件。
-
----
-
 ## 👥 作者
 
-- **开发团队** - 智能Agent开发项目组
+- **开发人员** - TonySuntianyu
 
 ---
 
