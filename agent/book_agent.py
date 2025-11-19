@@ -1,0 +1,265 @@
+"""
+图书推荐Agent实现
+"""
+import json
+from typing import Dict, Any, List
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, ToolMessage
+from langchain_core.tools import tool
+from langgraph.graph import StateGraph, END
+from langgraph.prebuilt import ToolNode
+from langgraph.graph.message import add_messages
+
+from book_state import BookRecommendationState, BookInfo, UserPreference
+from book_tools import book_recommendation_tool, book_search_tool, book_analysis_tool
+from config import DEEPSEEK_API_KEY, AGENT_MODEL, TEMPERATURE, DEEPSEEK_BASE_URL
+
+
+# 创建LLM实例 - 使用DeepSeek
+llm = ChatOpenAI(
+    api_key=DEEPSEEK_API_KEY,
+    model=AGENT_MODEL,
+    temperature=TEMPERATURE,
+    base_url=DEEPSEEK_BASE_URL
+)
+
+
+# 定义图书相关工具
+@tool
+def search_books(query: str, limit: int = 10) -> str:
+    """搜索图书"""
+    result = book_search_tool.search_books(query, limit)
+    return json.dumps(result, ensure_ascii=False)
+
+
+@tool
+def get_book_details(title: str) -> str:
+    """获取图书详细信息"""
+    result = book_search_tool.get_book_details(title)
+    return json.dumps(result, ensure_ascii=False)
+
+
+@tool
+def recommend_by_author(author: str, exclude_books: str = "[]") -> str:
+    """根据作者推荐图书"""
+    exclude_list = json.loads(exclude_books) if exclude_books else []
+    result = book_recommendation_tool.recommend_by_author(author, exclude_list)
+    return json.dumps(result, ensure_ascii=False)
+
+
+@tool
+def recommend_by_genre(genre: str, exclude_books: str = "[]") -> str:
+    """根据类型推荐图书"""
+    exclude_list = json.loads(exclude_books) if exclude_books else []
+    result = book_recommendation_tool.recommend_by_genre(genre, exclude_list)
+    return json.dumps(result, ensure_ascii=False)
+
+
+@tool
+def recommend_by_knowledge_graph(book_info: str) -> str:
+    """基于知识图谱推荐图书"""
+    book_data = json.loads(book_info)
+    result = book_recommendation_tool.recommend_by_knowledge_graph(book_data)
+    return json.dumps(result, ensure_ascii=False)
+
+
+@tool
+def get_user_preferences(user_id: str) -> str:
+    """获取用户偏好"""
+    result = book_recommendation_tool.get_user_preferences(user_id)
+    return json.dumps(result, ensure_ascii=False)
+
+
+@tool
+def update_user_preferences(user_id: str, book_info: str) -> str:
+    """更新用户偏好"""
+    book_data = json.loads(book_info)
+    result = book_recommendation_tool.update_user_preferences(user_id, book_data)
+    return json.dumps(result, ensure_ascii=False)
+
+
+@tool
+def analyze_reading_trends(user_history: str) -> str:
+    """分析用户阅读趋势"""
+    history_data = json.loads(user_history)
+    result = book_analysis_tool.analyze_reading_trends(history_data)
+    return json.dumps(result, ensure_ascii=False)
+
+
+@tool
+def get_similar_books(book_info: str) -> str:
+    """获取相似图书"""
+    book_data = json.loads(book_info)
+    result = book_analysis_tool.get_similar_books(book_data)
+    return json.dumps(result, ensure_ascii=False)
+
+
+# 工具列表
+book_tools = [
+    search_books,
+    get_book_details,
+    recommend_by_author,
+    recommend_by_genre,
+    recommend_by_knowledge_graph,
+    get_user_preferences,
+    update_user_preferences,
+    analyze_reading_trends,
+    get_similar_books
+]
+
+# 绑定工具到LLM
+llm_with_tools = llm.bind_tools(book_tools)
+
+
+def should_continue(state: BookRecommendationState) -> str:
+    """决定是否继续执行"""
+    messages = state.messages
+    
+    # 检查是否达到最大迭代次数
+    if state.iteration_count >= state.max_iterations:
+        return "end"
+    
+    # 检查最后一条消息是否是工具调用
+    last_message = messages[-1]
+    if hasattr(last_message, 'tool_calls') and last_message.tool_calls:
+        return "tools"
+    else:
+        return "end"
+
+
+def call_model(state: BookRecommendationState) -> Dict[str, Any]:
+    """调用模型生成响应"""
+    messages = state.messages
+    
+    # 添加系统消息
+    system_message = SystemMessage(content="""
+    你是一个专业的图书推荐助手，可以帮助用户：
+    1. 搜索图书信息
+    2. 根据用户浏览的图书推荐相似图书
+    3. 基于知识图谱进行智能推荐
+    4. 分析用户阅读偏好
+    5. 提供个性化的图书推荐
+    
+    你可以使用以下工具：
+    - search_books: 搜索图书
+    - get_book_details: 获取图书详细信息
+    - recommend_by_author: 根据作者推荐图书
+    - recommend_by_genre: 根据类型推荐图书
+    - recommend_by_knowledge_graph: 基于知识图谱推荐
+    - get_user_preferences: 获取用户偏好
+    - update_user_preferences: 更新用户偏好
+    - analyze_reading_trends: 分析阅读趋势
+    - get_similar_books: 获取相似图书
+    
+    请根据用户的需求选择合适的工具，并提供有用的图书推荐。
+    推荐时请说明推荐理由，并考虑用户的阅读偏好。
+    """)
+    
+    # 构建消息列表
+    all_messages = [system_message] + messages
+    
+    # 调用模型
+    response = llm_with_tools.invoke(all_messages)
+    
+    return {"messages": [response]}
+
+
+def call_tools(state: BookRecommendationState) -> Dict[str, Any]:
+    """调用工具"""
+    messages = state.messages
+    last_message = messages[-1]
+    
+    # 创建工具节点
+    tool_node = ToolNode(book_tools)
+    
+    # 调用工具
+    tool_messages = tool_node.invoke({"messages": [last_message]})
+    
+    return {"messages": tool_messages["messages"]}
+
+
+def create_book_agent_graph() -> StateGraph:
+    """创建图书推荐Agent图"""
+    
+    # 创建状态图
+    workflow = StateGraph(BookRecommendationState)
+    
+    # 添加节点
+    workflow.add_node("agent", call_model)
+    workflow.add_node("tools", call_tools)
+    
+    # 设置入口点
+    workflow.set_entry_point("agent")
+    
+    # 添加条件边
+    workflow.add_conditional_edges(
+        "agent",
+        should_continue,
+        {
+            "tools": "tools",
+            "end": END
+        }
+    )
+    
+    # 从工具回到agent
+    workflow.add_edge("tools", "agent")
+    
+    return workflow
+
+
+class BookRecommendationAgent:
+    """图书推荐Agent类"""
+    
+    def __init__(self):
+        self.graph = create_book_agent_graph().compile()
+    
+    def run(self, user_input: str, user_id: str = None, max_iterations: int = 5) -> Dict[str, Any]:
+        """运行图书推荐Agent"""
+        
+        # 创建初始状态
+        initial_state = BookRecommendationState(
+            messages=[HumanMessage(content=user_input)],
+            user_input=user_input,
+            user_id=user_id,
+            max_iterations=max_iterations,
+            iteration_count=0
+        )
+        
+        # 运行图
+        final_state = self.graph.invoke(initial_state)
+        
+        # 提取结果
+        result = {
+            "user_input": user_input,
+            "user_id": user_id,
+            "final_messages": final_state.get('messages', []),
+            "recommendations": final_state.get('recommendations', []),
+            "recommendation_reasons": final_state.get('recommendation_reasons', []),
+            "iteration_count": final_state.get('iteration_count', 0),
+            "is_finished": final_state.get('is_finished', False),
+            "error_message": final_state.get('error_message')
+        }
+        
+        return result
+    
+    def chat(self, message: str, user_id: str = None) -> str:
+        """简单的聊天接口"""
+        result = self.run(message, user_id)
+        
+        # 提取最后一条AI消息
+        messages = result["final_messages"]
+        for message in reversed(messages):
+            if isinstance(message, AIMessage):
+                return message.content
+        
+        return "抱歉，我无法处理您的图书推荐请求。"
+    
+    def recommend_books(self, book_title: str, user_id: str = None) -> Dict[str, Any]:
+        """推荐图书的专门方法"""
+        query = f"我浏览了图书《{book_title}》，请为我推荐相似的图书"
+        return self.run(query, user_id)
+    
+    def search_and_recommend(self, search_query: str, user_id: str = None) -> Dict[str, Any]:
+        """搜索并推荐图书"""
+        query = f"搜索图书：{search_query}，然后为我推荐相关图书"
+        return self.run(query, user_id)

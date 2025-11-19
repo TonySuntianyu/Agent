@@ -1,0 +1,12 @@
+# 图书推荐Agent最小依赖包
+
+# 核心框架
+langchain
+langchain-openai
+langchain-core
+langgraph
+
+# 数据处理
+pydantic
+python-dotenv
+requests
