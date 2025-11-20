@@ -1,13 +1,195 @@
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const sendButton = document.getElementById('send-button');
+const conversationList = document.getElementById('conversation-list');
+const newChatButton = document.getElementById('new-chat-button');
 
 const API_URL = 'http://127.0.0.1:5000'; // The address of the Flask server
 
-// 页面加载时显示欢迎消息
+// 会话管理
+let currentConversationId = null;
+const STORAGE_KEY = 'book_agent_conversations';
+
+// 初始化
 window.addEventListener('DOMContentLoaded', function() {
-    showWelcomeMessage();
+    loadConversations();
+    createNewConversation();
 });
+
+// 从localStorage加载会话列表
+function loadConversations() {
+    const conversations = getConversations();
+    renderConversationList(conversations);
+}
+
+// 获取所有会话
+function getConversations() {
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : {};
+}
+
+// 保存会话
+function saveConversations(conversations) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+}
+
+// 获取会话消息
+function getConversationMessages(conversationId) {
+    const conversations = getConversations();
+    return conversations[conversationId]?.messages || [];
+}
+
+// 保存消息到会话
+function saveMessageToConversation(conversationId, className, message) {
+    const conversations = getConversations();
+    if (!conversations[conversationId]) {
+        conversations[conversationId] = {
+            id: conversationId,
+            title: '新对话',
+            messages: [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+    }
+    
+    conversations[conversationId].messages.push({
+        className: className,
+        message: message,
+        timestamp: new Date().toISOString()
+    });
+    
+    // 更新会话标题（如果是第一条用户消息）
+    if (className === 'user-message') {
+        const userMessages = conversations[conversationId].messages.filter(m => m.className === 'user-message');
+        if (userMessages.length === 1) {
+            // 第一条用户消息作为标题
+            conversations[conversationId].title = getConversationTitle(message);
+        }
+    }
+    
+    conversations[conversationId].updatedAt = new Date().toISOString();
+    saveConversations(conversations);
+    renderConversationList(conversations);
+}
+
+// 从消息生成会话标题
+function getConversationTitle(message) {
+    if (message.length <= 20) {
+        return message;
+    }
+    return message.substring(0, 20) + '...';
+}
+
+// 渲染会话列表
+function renderConversationList(conversations) {
+    conversationList.innerHTML = '';
+    
+    const sortedConversations = Object.values(conversations)
+        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    
+    if (sortedConversations.length === 0) {
+        const emptyState = document.createElement('div');
+        emptyState.className = 'empty-state';
+        emptyState.innerHTML = '<p>暂无对话记录</p><p class="empty-hint">点击上方 + 按钮创建新会话</p>';
+        conversationList.appendChild(emptyState);
+        return;
+    }
+    
+    sortedConversations.forEach(conv => {
+        const item = document.createElement('div');
+        item.className = 'conversation-item';
+        if (conv.id === currentConversationId) {
+            item.classList.add('active');
+        }
+        
+        item.innerHTML = `
+            <span class="conversation-title" title="${conv.title}">${conv.title}</span>
+            <div class="conversation-actions">
+                <button class="rename-conversation" data-id="${conv.id}" title="重命名会话">
+                    <i class="fas fa-pen"></i>
+                </button>
+                <button class="delete-conversation" data-id="${conv.id}" title="删除会话">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+        
+        // 点击切换会话
+        item.addEventListener('click', (e) => {
+            if (!e.target.closest('.delete-conversation') && !e.target.closest('.rename-conversation')) {
+                switchConversation(conv.id);
+            }
+        });
+        
+        // 重命名会话
+        item.querySelector('.rename-conversation').addEventListener('click', (e) => {
+            e.stopPropagation();
+            renameConversation(conv.id);
+        });
+        
+        // 删除会话
+        item.querySelector('.delete-conversation').addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteConversation(conv.id);
+        });
+        
+        conversationList.appendChild(item);
+    });
+}
+
+// 创建新会话
+function createNewConversation() {
+    const conversationId = 'conv_' + Date.now();
+    currentConversationId = conversationId;
+    
+    // 清空聊天框
+    chatBox.innerHTML = '';
+    
+    // 显示欢迎消息
+    showWelcomeMessage();
+    
+    // 更新会话列表
+    loadConversations();
+}
+
+// 切换会话
+function switchConversation(conversationId) {
+    currentConversationId = conversationId;
+    
+    // 清空聊天框
+    chatBox.innerHTML = '';
+    
+    // 加载会话消息
+    const messages = getConversationMessages(conversationId);
+    messages.forEach(msg => {
+        appendMessage(msg.className, msg.message, false); // false表示不保存到localStorage
+    });
+    
+    // 更新会话列表高亮
+    loadConversations();
+    
+    // 滚动到底部
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// 删除会话
+function deleteConversation(conversationId) {
+    if (confirm('确定要删除这个对话记录吗？')) {
+        const conversations = getConversations();
+        delete conversations[conversationId];
+        saveConversations(conversations);
+        
+        // 如果删除的是当前会话，创建新会话
+        if (conversationId === currentConversationId) {
+            createNewConversation();
+        } else {
+            loadConversations();
+        }
+    }
+}
+
+// 新建会话按钮
+newChatButton.addEventListener('click', createNewConversation);
 
 // 显示欢迎消息
 function showWelcomeMessage() {
@@ -20,7 +202,7 @@ function showWelcomeMessage() {
         })
         .then(data => {
             if (data.message) {
-                appendMessage('agent-message', data.message);
+                appendMessage('agent-message', data.message, true);
             }
         })
         .catch(error => {
@@ -36,7 +218,7 @@ function showWelcomeMessage() {
    • 提供个性化的图书推荐
 
 💬 请告诉我您需要什么帮助吧！`;
-            appendMessage('agent-message', defaultWelcome);
+            appendMessage('agent-message', defaultWelcome, true);
         });
 }
 
@@ -51,7 +233,7 @@ function sendMessage() {
     const message = userInput.value.trim();
     if (message === '') return;
 
-    appendMessage('user-message', message);
+    appendMessage('user-message', message, true);
     userInput.value = '';
     
     // 禁用输入框和按钮
@@ -79,9 +261,9 @@ function sendMessage() {
         removeTypingIndicator(typingIndicator);
         
         if (data.response) {
-            appendMessage('agent-message', data.response);
+            appendMessage('agent-message', data.response, true);
         } else if (data.error) {
-            appendMessage('agent-message', `Error: ${data.error}`);
+            appendMessage('agent-message', `Error: ${data.error}`, true);
         }
     })
     .catch(error => {
@@ -89,7 +271,7 @@ function sendMessage() {
         removeTypingIndicator(typingIndicator);
         
         console.error('Error:', error);
-        appendMessage('agent-message', `Sorry, a connection error occurred: ${error.message}`);
+        appendMessage('agent-message', `Sorry, a connection error occurred: ${error.message}`, true);
     })
     .finally(() => {
         // 重新启用输入框和按钮
@@ -179,7 +361,7 @@ function formatMessage(text) {
     return formattedLines.join('');
 }
 
-function appendMessage(className, message) {
+function appendMessage(className, message, saveToStorage = true) {
     const messageElement = document.createElement('div');
     messageElement.className = `message ${className}`;
     
@@ -192,4 +374,31 @@ function appendMessage(className, message) {
     messageElement.appendChild(bubble);
     chatBox.appendChild(messageElement);
     chatBox.scrollTop = chatBox.scrollHeight; // Scroll to the bottom
+    
+    // 保存到localStorage
+    if (saveToStorage && currentConversationId) {
+        saveMessageToConversation(currentConversationId, className, message);
+    }
+}
+
+// 重命名会话
+function renameConversation(conversationId) {
+    const conversations = getConversations();
+    const conversation = conversations[conversationId];
+    if (!conversation) return;
+    
+    const currentTitle = conversation.title || '新对话';
+    const newTitle = prompt('请输入新的会话名称', currentTitle);
+    if (newTitle === null) return; // 用户取消
+    
+    const trimmed = newTitle.trim();
+    if (!trimmed) {
+        alert('会话名称不能为空');
+        return;
+    }
+    
+    conversation.title = trimmed.substring(0, 50);
+    conversation.updatedAt = new Date().toISOString();
+    saveConversations(conversations);
+    renderConversationList(conversations);
 }

@@ -9,11 +9,25 @@
 </head>
 <body>
     <div id="chat-container">
-        <div id="title-bar">Book Recommendation Agent</div>
-        <div id="chat-box"></div>
-        <div id="input-container">
-            <input type="text" id="user-input" placeholder="Type your message...">
-            <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+        <!-- 侧边栏：会话列表 -->
+        <div id="sidebar">
+            <div id="sidebar-header">
+                <h3>对话记录</h3>
+                <button id="new-chat-button" title="新建会话">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div id="conversation-list"></div>
+        </div>
+        
+        <!-- 主聊天区域 -->
+        <div id="main-chat">
+            <div id="title-bar">Book Recommendation Agent</div>
+            <div id="chat-box"></div>
+            <div id="input-container">
+                <input type="text" id="user-input" placeholder="输入消息...">
+                <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
