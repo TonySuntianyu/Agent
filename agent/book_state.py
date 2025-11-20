@@ -69,5 +69,8 @@ class BookRecommendationState(BaseModel):
     # 最终结果
     final_result: Optional[str] = None
     
+    # 会话偏好提示
+    preference_hint: Optional[str] = None
+    
     class Config:
         arbitrary_types_allowed = True

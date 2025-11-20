@@ -2,7 +2,8 @@
 图书推荐Agent实现
 """
 import json
-from typing import Dict, Any, List
+from collections import Counter, defaultdict
+from typing import Dict, Any, List, Optional, Tuple
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, ToolMessage
 from langchain_core.tools import tool
@@ -156,7 +157,12 @@ def call_model(state: BookRecommendationState) -> Dict[str, Any]:
     """)
     
     # 构建消息列表
-    all_messages = [system_message] + messages
+    preference_hint = getattr(state, "preference_hint", None)
+    if preference_hint:
+        preference_message = SystemMessage(content=preference_hint)
+        all_messages = [system_message, preference_message] + messages
+    else:
+        all_messages = [system_message] + messages
     
     # 调用模型
     response = llm_with_tools.invoke(all_messages)
@@ -212,8 +218,125 @@ class BookRecommendationAgent:
     
     def __init__(self):
         self.graph = create_book_agent_graph().compile()
+        self.conversation_history = defaultdict(list)
+        self._prepare_metadata()
+        self.max_history_entries = 50
+        self.recent_window = 5
     
-    def run(self, user_input: str, user_id: str = None, max_iterations: int = 5) -> Dict[str, Any]:
+    def _prepare_metadata(self) -> None:
+        """预处理作者、类型、书名等元数据，便于快速抽取偏好"""
+        books = book_recommendation_tool.db.books
+        author_set = {book.get("author") for book in books if book.get("author")}
+        genre_set = {book.get("genre") for book in books if book.get("genre")}
+        self.author_entries = [(author, author.lower()) for author in sorted(author_set, key=len, reverse=True)]
+        self.genre_entries = [(genre, genre.lower()) for genre in sorted(genre_set, key=len, reverse=True)]
+        title_set = {book.get("title") for book in books if book.get("title")}
+        self.title_entries = [(title, title.lower()) for title in sorted(title_set, key=len, reverse=True)]
+        self.title_lookup: Dict[str, Dict[str, Any]] = {}
+        for book in books:
+            title = book.get("title")
+            if title:
+                self.title_lookup[title.lower()] = book
+    
+    def _normalize_user_id(self, user_id: Optional[str]) -> str:
+        return user_id or "anonymous_user"
+    
+    def _append_history(self, user_id: str, entry: Dict[str, Any]) -> None:
+        history = self.conversation_history[user_id]
+        history.append(entry)
+        if len(history) > self.max_history_entries:
+            self.conversation_history[user_id] = history[-self.max_history_entries:]
+    
+    def _extract_entities(self, text: str) -> Tuple[List[str], List[str], List[str]]:
+        if not text:
+            return [], [], []
+        text_lower = text.lower()
+        authors = {raw for raw, lower in self.author_entries if lower in text_lower}
+        genres = {raw for raw, lower in self.genre_entries if lower in text_lower}
+        titles = {raw for raw, lower in self.title_entries if lower in text_lower}
+        
+        # 通过书名自动补全作者/类型偏好
+        for title in titles:
+            book = self.title_lookup.get(title.lower())
+            if not book:
+                continue
+            author = book.get("author")
+            genre = book.get("genre")
+            if author:
+                authors.add(author)
+            if genre:
+                genres.add(genre)
+        
+        return sorted(authors), sorted(genres), sorted(titles)
+    
+    def _record_user_message(self, user_id: Optional[str], content: str) -> None:
+        normalized_id = self._normalize_user_id(user_id)
+        authors, genres, titles = self._extract_entities(content)
+        entry = {
+            "role": "user",
+            "content": content,
+            "authors": authors,
+            "genres": genres,
+            "titles": titles
+        }
+        self._append_history(normalized_id, entry)
+    
+    def _record_ai_message(self, user_id: Optional[str], content: str) -> None:
+        normalized_id = self._normalize_user_id(user_id)
+        entry = {
+            "role": "assistant",
+            "content": content
+        }
+        self._append_history(normalized_id, entry)
+    
+    def _extract_last_ai_message(self, messages: List[Any]) -> Optional[str]:
+        for message in reversed(messages or []):
+            if isinstance(message, AIMessage):
+                return message.content
+        return None
+    
+    def _build_preference_hint(self, user_id: Optional[str]) -> Optional[str]:
+        normalized_id = self._normalize_user_id(user_id)
+        history = self.conversation_history.get(normalized_id, [])
+        user_entries = [entry for entry in history if entry.get("role") == "user"]
+        if not user_entries:
+            return None
+        
+        recent_entries = user_entries[-self.recent_window:]
+        author_counter = Counter()
+        genre_counter = Counter()
+        for entry in recent_entries:
+            for author in entry.get("authors", []):
+                author_counter[author] += 1
+            for genre in entry.get("genres", []):
+                genre_counter[genre] += 1
+        
+        if not author_counter and not genre_counter:
+            return None
+        
+        hint_lines = ["请结合以下会话偏好优先推荐相关图书，并在回复中明确指出是“因为你之前提到过……所以优先推荐……”。"]
+        if author_counter:
+            top_authors = [name for name, _ in author_counter.most_common(3)]
+            hint_lines.append(f"- 最近关注的作者：{', '.join(top_authors)}")
+        if genre_counter:
+            top_genres = [name for name, _ in genre_counter.most_common(3)]
+            hint_lines.append(f"- 最近关注的类型：{', '.join(top_genres)}")
+        hint_lines.append("若新的推荐满足这些偏好，请在回复中显式说明这一理由。")
+        return "\n".join(hint_lines)
+    
+    def _post_interaction(self, user_id: Optional[str], user_input: str, final_messages: List[Any]) -> None:
+        self._record_user_message(user_id, user_input)
+        response = self._extract_last_ai_message(final_messages)
+        if response:
+            self._record_ai_message(user_id, response)
+    
+    def run(
+        self,
+        user_input: str,
+        user_id: str = None,
+        max_iterations: int = 5,
+        preference_hint: Optional[str] = None
+    ) -> Dict[str, Any]:
         """运行图书推荐Agent"""
         
         # 创建初始状态
@@ -222,7 +345,8 @@ class BookRecommendationAgent:
             user_input=user_input,
             user_id=user_id,
             max_iterations=max_iterations,
-            iteration_count=0
+            iteration_count=0,
+            preference_hint=preference_hint
         )
         
         # 运行图
@@ -244,22 +368,28 @@ class BookRecommendationAgent:
     
     def chat(self, message: str, user_id: str = None) -> str:
         """简单的聊天接口"""
-        result = self.run(message, user_id)
+        preference_hint = self._build_preference_hint(user_id)
+        result = self.run(message, user_id, preference_hint=preference_hint)
+        messages = result.get("final_messages", [])
+        response = self._extract_last_ai_message(messages)
+        self._post_interaction(user_id, message, messages)
         
-        # 提取最后一条AI消息
-        messages = result["final_messages"]
-        for message in reversed(messages):
-            if isinstance(message, AIMessage):
-                return message.content
-        
+        if response:
+            return response
         return "抱歉，我无法处理您的图书推荐请求。"
     
     def recommend_books(self, book_title: str, user_id: str = None) -> Dict[str, Any]:
         """推荐图书的专门方法"""
         query = f"我浏览了图书《{book_title}》，请为我推荐相似的图书"
-        return self.run(query, user_id)
+        preference_hint = self._build_preference_hint(user_id)
+        result = self.run(query, user_id, preference_hint=preference_hint)
+        self._post_interaction(user_id, query, result.get("final_messages", []))
+        return result
     
     def search_and_recommend(self, search_query: str, user_id: str = None) -> Dict[str, Any]:
         """搜索并推荐图书"""
         query = f"搜索图书：{search_query}，然后为我推荐相关图书"
-        return self.run(query, user_id)
+        preference_hint = self._build_preference_hint(user_id)
+        result = self.run(query, user_id, preference_hint=preference_hint)
+        self._post_interaction(user_id, query, result.get("final_messages", []))
+        return result
