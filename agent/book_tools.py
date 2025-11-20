@@ -117,6 +117,366 @@ class BookDatabase:
                 "description": "讲述了在僻静街道旁的一家杂货店，只要写下烦恼投进店前门卷帘门的投信口。",
                 "publication_year": 2012,
                 "publisher": "南海出版公司"
+            },
+            {
+                "title": "白夜行",
+                "author": "东野圭吾",
+                "isbn": "9787544258609",
+                "genre": "推理小说",
+                "rating": 9.1,
+                "description": "一部关于绝望与希望的推理小说，讲述了两个孩子的悲剧命运。",
+                "publication_year": 1999,
+                "publisher": "南海出版公司"
+            },
+            {
+                "title": "嫌疑人X的献身",
+                "author": "东野圭吾",
+                "isbn": "9787544258616",
+                "genre": "推理小说",
+                "rating": 8.9,
+                "description": "一个数学天才为了帮助邻居掩盖罪行而精心设计的完美犯罪。",
+                "publication_year": 2005,
+                "publisher": "南海出版公司"
+            },
+            {
+                "title": "挪威的森林",
+                "author": "村上春树",
+                "isbn": "9787532742923",
+                "genre": "文学",
+                "rating": 8.8,
+                "description": "一部关于青春、爱情和成长的青春小说。",
+                "publication_year": 1987,
+                "publisher": "上海译文出版社"
+            },
+            {
+                "title": "1Q84",
+                "author": "村上春树",
+                "isbn": "9787532754681",
+                "genre": "文学",
+                "rating": 8.5,
+                "description": "一个充满悬疑和奇幻色彩的长篇小说。",
+                "publication_year": 2009,
+                "publisher": "南海出版公司"
+            },
+            {
+                "title": "海边的卡夫卡",
+                "author": "村上春树",
+                "isbn": "9787532742924",
+                "genre": "文学",
+                "rating": 8.7,
+                "description": "一个15岁少年的成长故事，充满超现实主义的色彩。",
+                "publication_year": 2002,
+                "publisher": "上海译文出版社"
+            },
+            {
+                "title": "红高粱",
+                "author": "莫言",
+                "isbn": "9787020008739",
+                "genre": "文学",
+                "rating": 8.9,
+                "description": "以抗日战争为背景，讲述了一个家族三代人的故事。",
+                "publication_year": 1987,
+                "publisher": "人民文学出版社"
+            },
+            {
+                "title": "丰乳肥臀",
+                "author": "莫言",
+                "isbn": "9787020008740",
+                "genre": "文学",
+                "rating": 8.6,
+                "description": "通过一个家族的兴衰，展现了中国近现代历史的变迁。",
+                "publication_year": 1995,
+                "publisher": "作家出版社"
+            },
+            {
+                "title": "蛙",
+                "author": "莫言",
+                "isbn": "9787020008741",
+                "genre": "文学",
+                "rating": 8.4,
+                "description": "以计划生育为背景，讲述了一个乡村医生的故事。",
+                "publication_year": 2009,
+                "publisher": "上海文艺出版社"
+            },
+            {
+                "title": "平凡的世界",
+                "author": "路遥",
+                "isbn": "9787020008738",
+                "genre": "文学",
+                "rating": 9.2,
+                "description": "一部全景式地表现中国当代城乡社会生活的长篇小说。",
+                "publication_year": 1986,
+                "publisher": "人民文学出版社"
+            },
+            {
+                "title": "人生",
+                "author": "路遥",
+                "isbn": "9787020008737",
+                "genre": "文学",
+                "rating": 8.7,
+                "description": "讲述了一个农村青年在人生道路上的选择与挣扎。",
+                "publication_year": 1982,
+                "publisher": "人民文学出版社"
+            },
+            {
+                "title": "黄金时代",
+                "author": "王小波",
+                "isbn": "9787532733441",
+                "genre": "文学",
+                "rating": 9.0,
+                "description": "以文革为背景，讲述了一个知识分子的荒诞经历。",
+                "publication_year": 1991,
+                "publisher": "花城出版社"
+            },
+            {
+                "title": "沉默的大多数",
+                "author": "王小波",
+                "isbn": "9787532733442",
+                "genre": "杂文",
+                "rating": 8.8,
+                "description": "王小波的杂文代表作，展现了他独特的思考方式。",
+                "publication_year": 1997,
+                "publisher": "中国青年出版社"
+            },
+            {
+                "title": "围城",
+                "author": "钱钟书",
+                "isbn": "9787020008736",
+                "genre": "文学",
+                "rating": 9.1,
+                "description": "一部讽刺小说，描绘了抗战初期知识分子的群像。",
+                "publication_year": 1947,
+                "publisher": "人民文学出版社"
+            },
+            {
+                "title": "边城",
+                "author": "沈从文",
+                "isbn": "9787020008735",
+                "genre": "文学",
+                "rating": 8.9,
+                "description": "以湘西为背景，讲述了一个纯美的爱情故事。",
+                "publication_year": 1934,
+                "publisher": "人民文学出版社"
+            },
+            {
+                "title": "老人与海",
+                "author": "海明威",
+                "isbn": "9787532742925",
+                "genre": "文学",
+                "rating": 8.8,
+                "description": "一个老渔夫与一条大鱼的搏斗，展现了人的尊严和勇气。",
+                "publication_year": 1952,
+                "publisher": "上海译文出版社"
+            },
+            {
+                "title": "太阳照常升起",
+                "author": "海明威",
+                "isbn": "9787532742926",
+                "genre": "文学",
+                "rating": 8.5,
+                "description": "描写了一战后一群流落欧洲的美国青年的生活。",
+                "publication_year": 1926,
+                "publisher": "上海译文出版社"
+            },
+            {
+                "title": "变形记",
+                "author": "卡夫卡",
+                "isbn": "9787532742927",
+                "genre": "文学",
+                "rating": 8.9,
+                "description": "一个人变成甲虫的荒诞故事，反映了现代人的异化。",
+                "publication_year": 1915,
+                "publisher": "上海译文出版社"
+            },
+            {
+                "title": "城堡",
+                "author": "卡夫卡",
+                "isbn": "9787532742928",
+                "genre": "文学",
+                "rating": 8.7,
+                "description": "一个土地测量员试图进入城堡的故事，充满象征意义。",
+                "publication_year": 1926,
+                "publisher": "上海译文出版社"
+            },
+            {
+                "title": "追风筝的人",
+                "author": "卡勒德·胡赛尼",
+                "isbn": "9787532742929",
+                "genre": "文学",
+                "rating": 8.9,
+                "description": "一个关于友谊、背叛和救赎的故事。",
+                "publication_year": 2003,
+                "publisher": "上海人民出版社"
+            },
+            {
+                "title": "灿烂千阳",
+                "author": "卡勒德·胡赛尼",
+                "isbn": "9787532742930",
+                "genre": "文学",
+                "rating": 8.7,
+                "description": "两个阿富汗女性的故事，展现了战争对女性的影响。",
+                "publication_year": 2007,
+                "publisher": "上海人民出版社"
+            },
+            {
+                "title": "小王子",
+                "author": "安托万·德·圣埃克苏佩里",
+                "isbn": "9787532742931",
+                "genre": "童话",
+                "rating": 9.3,
+                "description": "一部写给大人的童话，探讨了爱与责任的主题。",
+                "publication_year": 1943,
+                "publisher": "人民文学出版社"
+            },
+            {
+                "title": "月亮与六便士",
+                "author": "毛姆",
+                "isbn": "9787532742932",
+                "genre": "文学",
+                "rating": 8.8,
+                "description": "一个证券经纪人放弃一切追求艺术梦想的故事。",
+                "publication_year": 1919,
+                "publisher": "上海译文出版社"
+            },
+            {
+                "title": "人性的枷锁",
+                "author": "毛姆",
+                "isbn": "9787532742933",
+                "genre": "文学",
+                "rating": 8.6,
+                "description": "一个青年的成长历程，探讨了人生的意义。",
+                "publication_year": 1915,
+                "publisher": "上海译文出版社"
+            },
+            {
+                "title": "局外人",
+                "author": "阿尔贝·加缪",
+                "isbn": "9787532742934",
+                "genre": "文学",
+                "rating": 9.0,
+                "description": "一个对生活漠不关心的人的故事，探讨了存在的荒诞性。",
+                "publication_year": 1942,
+                "publisher": "上海译文出版社"
+            },
+            {
+                "title": "鼠疫",
+                "author": "阿尔贝·加缪",
+                "isbn": "9787532742935",
+                "genre": "文学",
+                "rating": 8.9,
+                "description": "一个城市爆发鼠疫的故事，展现了人类面对灾难的勇气。",
+                "publication_year": 1947,
+                "publisher": "上海译文出版社"
+            },
+            {
+                "title": "麦田里的守望者",
+                "author": "J.D.塞林格",
+                "isbn": "9787532742936",
+                "genre": "文学",
+                "rating": 8.7,
+                "description": "一个16岁少年的内心独白，反映了青少年的迷茫和反叛。",
+                "publication_year": 1951,
+                "publisher": "译林出版社"
+            },
+            {
+                "title": "了不起的盖茨比",
+                "author": "F.斯科特·菲茨杰拉德",
+                "isbn": "9787532742937",
+                "genre": "文学",
+                "rating": 8.8,
+                "description": "一个关于美国梦的破灭的故事。",
+                "publication_year": 1925,
+                "publisher": "上海译文出版社"
+            },
+            {
+                "title": "杀死一只知更鸟",
+                "author": "哈珀·李",
+                "isbn": "9787532742938",
+                "genre": "文学",
+                "rating": 9.2,
+                "description": "一个关于种族歧视和正义的故事，通过孩子的视角展现。",
+                "publication_year": 1960,
+                "publisher": "译林出版社"
+            },
+            {
+                "title": "飘",
+                "author": "玛格丽特·米切尔",
+                "isbn": "9787532742939",
+                "genre": "文学",
+                "rating": 9.0,
+                "description": "以美国南北战争为背景，讲述了一个女性的成长故事。",
+                "publication_year": 1936,
+                "publisher": "译林出版社"
+            },
+            {
+                "title": "简·爱",
+                "author": "夏洛蒂·勃朗特",
+                "isbn": "9787532742940",
+                "genre": "文学",
+                "rating": 8.9,
+                "description": "一个独立女性的成长故事，追求自由和平等。",
+                "publication_year": 1847,
+                "publisher": "人民文学出版社"
+            },
+            {
+                "title": "呼啸山庄",
+                "author": "艾米莉·勃朗特",
+                "isbn": "9787532742941",
+                "genre": "文学",
+                "rating": 8.8,
+                "description": "一个关于复仇和爱情的哥特式小说。",
+                "publication_year": 1847,
+                "publisher": "人民文学出版社"
+            },
+            {
+                "title": "傲慢与偏见",
+                "author": "简·奥斯汀",
+                "isbn": "9787532742942",
+                "genre": "文学",
+                "rating": 9.1,
+                "description": "一部经典的爱情小说，探讨了社会阶层和婚姻。",
+                "publication_year": 1813,
+                "publisher": "人民文学出版社"
+            },
+            {
+                "title": "罪与罚",
+                "author": "陀思妥耶夫斯基",
+                "isbn": "9787532742943",
+                "genre": "文学",
+                "rating": 9.2,
+                "description": "一个大学生犯罪后的心理挣扎和救赎。",
+                "publication_year": 1866,
+                "publisher": "人民文学出版社"
+            },
+            {
+                "title": "战争与和平",
+                "author": "列夫·托尔斯泰",
+                "isbn": "9787532742944",
+                "genre": "文学",
+                "rating": 9.3,
+                "description": "以拿破仑战争为背景，展现了俄国社会的全景。",
+                "publication_year": 1869,
+                "publisher": "人民文学出版社"
+            },
+            {
+                "title": "安娜·卡列尼娜",
+                "author": "列夫·托尔斯泰",
+                "isbn": "9787532742945",
+                "genre": "文学",
+                "rating": 9.2,
+                "description": "一个已婚女性的爱情悲剧，反映了俄国社会的道德观念。",
+                "publication_year": 1877,
+                "publisher": "人民文学出版社"
+            },
+            {
+                "title": "复活",
+                "author": "列夫·托尔斯泰",
+                "isbn": "9787532742946",
+                "genre": "文学",
+                "rating": 8.9,
+                "description": "一个贵族青年的精神复活，探讨了道德和救赎。",
+                "publication_year": 1899,
+                "publisher": "人民文学出版社"
             }
         ]
     
@@ -146,29 +506,142 @@ class BookDatabase:
                 },
                 "东野圭吾": {
                     "genres": ["推理小说"],
-                    "books": ["解忧杂货店"],
+                    "books": ["解忧杂货店", "白夜行", "嫌疑人X的献身"],
                     "style": "悬疑推理"
+                },
+                "村上春树": {
+                    "genres": ["文学"],
+                    "books": ["挪威的森林", "1Q84", "海边的卡夫卡"],
+                    "style": "超现实主义"
+                },
+                "莫言": {
+                    "genres": ["文学"],
+                    "books": ["红高粱", "丰乳肥臀", "蛙"],
+                    "style": "魔幻现实主义"
+                },
+                "路遥": {
+                    "genres": ["文学"],
+                    "books": ["平凡的世界", "人生"],
+                    "style": "现实主义"
+                },
+                "王小波": {
+                    "genres": ["文学", "杂文"],
+                    "books": ["黄金时代", "沉默的大多数"],
+                    "style": "黑色幽默"
+                },
+                "钱钟书": {
+                    "genres": ["文学"],
+                    "books": ["围城"],
+                    "style": "讽刺文学"
+                },
+                "沈从文": {
+                    "genres": ["文学"],
+                    "books": ["边城"],
+                    "style": "乡土文学"
+                },
+                "海明威": {
+                    "genres": ["文学"],
+                    "books": ["老人与海", "太阳照常升起"],
+                    "style": "冰山理论"
+                },
+                "卡夫卡": {
+                    "genres": ["文学"],
+                    "books": ["变形记", "城堡"],
+                    "style": "荒诞主义"
+                },
+                "卡勒德·胡赛尼": {
+                    "genres": ["文学"],
+                    "books": ["追风筝的人", "灿烂千阳"],
+                    "style": "现实主义"
+                },
+                "安托万·德·圣埃克苏佩里": {
+                    "genres": ["童话"],
+                    "books": ["小王子"],
+                    "style": "哲理童话"
+                },
+                "毛姆": {
+                    "genres": ["文学"],
+                    "books": ["月亮与六便士", "人性的枷锁"],
+                    "style": "现实主义"
+                },
+                "阿尔贝·加缪": {
+                    "genres": ["文学"],
+                    "books": ["局外人", "鼠疫"],
+                    "style": "存在主义"
+                },
+                "J.D.塞林格": {
+                    "genres": ["文学"],
+                    "books": ["麦田里的守望者"],
+                    "style": "现代主义"
+                },
+                "F.斯科特·菲茨杰拉德": {
+                    "genres": ["文学"],
+                    "books": ["了不起的盖茨比"],
+                    "style": "现代主义"
+                },
+                "哈珀·李": {
+                    "genres": ["文学"],
+                    "books": ["杀死一只知更鸟"],
+                    "style": "现实主义"
+                },
+                "玛格丽特·米切尔": {
+                    "genres": ["文学"],
+                    "books": ["飘"],
+                    "style": "历史小说"
+                },
+                "夏洛蒂·勃朗特": {
+                    "genres": ["文学"],
+                    "books": ["简·爱"],
+                    "style": "现实主义"
+                },
+                "艾米莉·勃朗特": {
+                    "genres": ["文学"],
+                    "books": ["呼啸山庄"],
+                    "style": "哥特式"
+                },
+                "简·奥斯汀": {
+                    "genres": ["文学"],
+                    "books": ["傲慢与偏见"],
+                    "style": "现实主义"
+                },
+                "陀思妥耶夫斯基": {
+                    "genres": ["文学"],
+                    "books": ["罪与罚"],
+                    "style": "心理现实主义"
+                },
+                "列夫·托尔斯泰": {
+                    "genres": ["文学"],
+                    "books": ["战争与和平", "安娜·卡列尼娜", "复活"],
+                    "style": "现实主义"
                 }
             },
             "genres": {
                 "科幻": {
                     "authors": ["刘慈欣"],
-                    "similar_genres": ["魔幻现实主义", "反乌托邦"]
+                    "similar_genres": ["魔幻现实主义", "反乌托邦", "文学"]
                 },
                 "文学": {
-                    "authors": ["余华"],
-                    "similar_genres": ["魔幻现实主义"]
+                    "authors": ["余华", "村上春树", "莫言", "路遥", "王小波", "钱钟书", "沈从文", "海明威", "卡夫卡", "卡勒德·胡赛尼", "毛姆", "阿尔贝·加缪", "J.D.塞林格", "F.斯科特·菲茨杰拉德", "哈珀·李", "玛格丽特·米切尔", "夏洛蒂·勃朗特", "艾米莉·勃朗特", "简·奥斯汀", "陀思妥耶夫斯基", "列夫·托尔斯泰"],
+                    "similar_genres": ["魔幻现实主义", "推理小说", "童话"]
                 },
                 "魔幻现实主义": {
-                    "authors": ["加西亚·马尔克斯"],
+                    "authors": ["加西亚·马尔克斯", "莫言"],
                     "similar_genres": ["文学", "科幻"]
                 },
                 "反乌托邦": {
                     "authors": ["乔治·奥威尔"],
-                    "similar_genres": ["科幻"]
+                    "similar_genres": ["科幻", "文学"]
                 },
                 "推理小说": {
                     "authors": ["东野圭吾"],
+                    "similar_genres": ["文学"]
+                },
+                "童话": {
+                    "authors": ["安托万·德·圣埃克苏佩里"],
+                    "similar_genres": ["文学"]
+                },
+                "杂文": {
+                    "authors": ["王小波"],
                     "similar_genres": ["文学"]
                 }
             }

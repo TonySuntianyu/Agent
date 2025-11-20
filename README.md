@@ -4,10 +4,6 @@
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![LangGraph](https://img.shields.io/badge/LangGraph-0.0.20+-green.svg)
-<<<<<<< HEAD
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
-=======
->>>>>>> 11b74e2024cd1e2bdc0b05fb4a292d65b6b1ea6c
 
 一个基于LangGraph框架构建的智能Agent系统，包含通用Agent框架和图书推荐应用
 
@@ -439,21 +435,9 @@ pip install -r requirements.txt
 
 ---
 
-<<<<<<< HEAD
-## 📄 许可证
-
-本项目采用 MIT 许可证。详情请参阅 [LICENSE](LICENSE) 文件。
-
----
-
-## 👥 作者
-
-- **开发团队** - 智能Agent开发项目组
-=======
 ## 👥 作者
 
 - **开发人员** - TonySuntianyu
->>>>>>> 11b74e2024cd1e2bdc0b05fb4a292d65b6b1ea6c
 
 ---
 
@@ -465,17 +449,6 @@ pip install -r requirements.txt
 - [Pydantic](https://github.com/pydantic/pydantic) - 数据验证库
 - [Flask](https://github.com/pallets/flask) - Web框架
 
-<<<<<<< HEAD
----
-
-## 📞 联系方式
-
-如有问题或建议，请：
-- 创建 [Issue](../../issues)
-- 发送邮件
-- 联系开发团队
-=======
->>>>>>> 11b74e2024cd1e2bdc0b05fb4a292d65b6b1ea6c
 
 ---
 
@@ -483,11 +456,7 @@ pip install -r requirements.txt
 
 **⭐ 如果这个项目对你有帮助，请给个Star！⭐**
 
-<<<<<<< HEAD
-最后更新: 2024年12月 | 项目版本: 1.0.0 | 维护状态: 活跃开发中
-=======
 最后更新: 2025年11月 | 项目版本: 1.0.0 | 维护状态: 没有人管它了
->>>>>>> 11b74e2024cd1e2bdc0b05fb4a292d65b6b1ea6c
 
 </div>
 
