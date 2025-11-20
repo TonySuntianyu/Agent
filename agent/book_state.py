@@ -53,6 +53,9 @@ class BookRecommendationState(BaseModel):
     # 搜索历史
     search_history: List[str] = Field(default_factory=list)
     
+    # 反馈历史
+    feedback_history: List[Dict[str, Any]] = Field(default_factory=list)
+    
     # 迭代计数
     iteration_count: int = 0
     max_iterations: int = 5

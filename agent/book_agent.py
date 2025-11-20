@@ -219,6 +219,7 @@ class BookRecommendationAgent:
     def __init__(self):
         self.graph = create_book_agent_graph().compile()
         self.conversation_history = defaultdict(list)
+        self.user_feedback = defaultdict(list)
         self._prepare_metadata()
         self.max_history_entries = 50
         self.recent_window = 5
@@ -289,6 +290,79 @@ class BookRecommendationAgent:
         }
         self._append_history(normalized_id, entry)
     
+    def _record_feedback(
+        self,
+        user_id: Optional[str],
+        book_title: str,
+        rating: Optional[float] = None,
+        comment: Optional[str] = None
+    ) -> str:
+        normalized_id = self._normalize_user_id(user_id)
+        rating_value = None
+        if rating is not None:
+            try:
+                rating_value = max(0.0, min(10.0, float(rating)))
+            except ValueError:
+                rating_value = None
+        book = self.title_lookup.get(book_title.lower()) if book_title else None
+        author = book.get("author") if book else None
+        genre = book.get("genre") if book else None
+        feedback_entry = {
+            "book_title": book_title,
+            "rating": rating_value,
+            "comment": comment,
+            "author": author,
+            "genre": genre
+        }
+        self.user_feedback[normalized_id].append(feedback_entry)
+        self._append_history(normalized_id, {
+            "role": "feedback",
+            "content": json.dumps(feedback_entry, ensure_ascii=False)
+        })
+        rating_text = f"{rating_value:.1f} 分" if rating_value is not None else "未给出分数"
+        if comment:
+            return f"已记录您对《{book_title}》的评价（{rating_text}）。评论：{comment}"
+        return f"已记录您对《{book_title}》的评价（{rating_text}）。"
+    
+    def _feedback_hint_lines(self, user_id: str) -> List[str]:
+        entries = self.user_feedback.get(user_id, [])
+        if not entries:
+            return []
+        positive_authors = Counter()
+        positive_genres = Counter()
+        negative_authors = Counter()
+        negative_genres = Counter()
+        for entry in entries:
+            rating = entry.get("rating")
+            author = entry.get("author")
+            genre = entry.get("genre")
+            if rating is None:
+                continue
+            if rating >= 7.0:
+                if author:
+                    positive_authors[author] += 1
+                if genre:
+                    positive_genres[genre] += 1
+            elif rating <= 4.0:
+                if author:
+                    negative_authors[author] += 1
+                if genre:
+                    negative_genres[genre] += 1
+        lines = []
+        if positive_authors:
+            top = ", ".join(name for name, _ in positive_authors.most_common(3))
+            lines.append(f"- 用户对以下作者评分较高：{top}，可优先推荐其作品")
+        if positive_genres:
+            top = ", ".join(name for name, _ in positive_genres.most_common(3))
+            lines.append(f"- 用户对以下类型评分较高：{top}")
+        if negative_authors:
+            top = ", ".join(name for name, _ in negative_authors.most_common(3))
+            lines.append(f"- 以下作者评分较低，可谨慎推荐：{top}")
+        if negative_genres:
+            top = ", ".join(name for name, _ in negative_genres.most_common(3))
+            lines.append(f"- 以下类型曾被低分评价：{top}")
+        return lines
+    
     def _extract_last_ai_message(self, messages: List[Any]) -> Optional[str]:
         for message in reversed(messages or []):
             if isinstance(message, AIMessage):
@@ -321,6 +395,10 @@ class BookRecommendationAgent:
         if genre_counter:
             top_genres = [name for name, _ in genre_counter.most_common(3)]
             hint_lines.append(f"- 最近关注的类型：{', '.join(top_genres)}")
+        feedback_lines = self._feedback_hint_lines(normalized_id)
+        if feedback_lines:
+            hint_lines.append("- 以下内容来自用户对历史推荐的评分：")
+            hint_lines.extend(feedback_lines)
         hint_lines.append("若新的推荐满足这些偏好，请在回复中显式说明这一理由。")
         return "\n".join(hint_lines)
     
@@ -385,6 +463,18 @@ class BookRecommendationAgent:
         result = self.run(query, user_id, preference_hint=preference_hint)
         self._post_interaction(user_id, query, result.get("final_messages", []))
         return result
+    
+    def submit_feedback(
+        self,
+        user_id: Optional[str],
+        book_title: str,
+        rating: Optional[float] = None,
+        comment: Optional[str] = None
+    ) -> Dict[str, Any]:
+        if not book_title:
+            return {"success": False, "message": "请提供书名"}
+        ack = self._record_feedback(user_id, book_title, rating, comment)
+        return {"success": True, "message": ack}
     
     def search_and_recommend(self, search_query: str, user_id: str = None) -> Dict[str, Any]:
         """搜索并推荐图书"""

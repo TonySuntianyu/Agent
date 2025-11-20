@@ -74,5 +74,20 @@ def welcome():
     
     return jsonify({'message': welcome_message})
 
+@app.route('/feedback', methods=['POST'])
+def feedback():
+    """
+    接收用户对推荐书籍的评分或文字评价。
+    """
+    data = request.get_json()
+    user_id = data.get('user_id', 'default_user')
+    book_title = data.get('book_title')
+    rating = data.get('rating')
+    comment = data.get('comment')
+    
+    result = agent.submit_feedback(user_id, book_title, rating, comment)
+    status_code = 200 if result.get("success") else 400
+    return jsonify(result), status_code
+
 if __name__ == '__main__':
     app.run(debug=True)
