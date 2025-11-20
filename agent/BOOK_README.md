@@ -98,6 +98,14 @@ result = agent.recommend_books("三体", "user001")
 
 # 搜索并推荐
 result = agent.search_and_recommend("余华", "user002")
+
+# 记录用户评价，供下一次推荐参考
+agent.submit_feedback(
+    user_id="user002",
+    book_title="活着",
+    rating=9.0,
+    comment="剧情震撼，很喜欢余华的笔触"
+)
 ```
 
 ### 交互式使用
@@ -112,6 +120,8 @@ python book_run.py
 # 
 # 您: 我看了《三体》，推荐相似图书
 # Agent: 基于《三体》，我推荐以下图书...
+# 您: 更想继续看刘慈欣的作品
+# Agent: 后续会明确说明“因为你之前提到刘慈欣，所以优先推荐……”
 ```
 
 ## 🛠️ 核心组件
@@ -226,6 +236,22 @@ books = [
     }
 ]
 ```
+
+### 4. 会话偏好与评分反馈
+
+- **会话偏好记忆**：Agent 会自动解析最近几条对话中出现的作者/类型/书名，将这些偏好写入系统提示，确保回复里明确说明“因为你之前提到…所以优先推荐…”.
+- **评分反馈**：通过 `agent.submit_feedback()` 或 HTTP `POST /feedback` 接口提交推荐结果的评分/评论，系统会将高分作者/类型提权、低分内容降权。
+- **HTTP 示例**：
+  ```bash
+  curl -X POST http://localhost:5000/feedback \
+    -H "Content-Type: application/json" \
+    -d '{
+          "user_id": "reader001",
+          "book_title": "三体",
+          "rating": 9.5,
+          "comment": "硬科幻设定很对胃口"
+        }'
+  ```
 
 ## 📈 扩展功能
 
